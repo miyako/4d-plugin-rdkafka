@@ -50,3 +50,5 @@ json|TEXT|delivery report (``JSON``)
 error|LONGINT|
 
 partition is fixed to ``RD_KAFKA_PARTITION_UA``.
+
+``key`` option of ``rd_kafka_produce()`` is not implemented.
