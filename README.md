@@ -41,7 +41,7 @@ version:=KAFKA Get version
 
 Parameter|Type|Description
 ------------|------------|----
-version|TEXT|
+version|TEXT|``0.11.1``
 
 ```
 error:=KAFKA Get topic (brokers;topic;json)
