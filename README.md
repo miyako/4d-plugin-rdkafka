@@ -51,3 +51,16 @@ partition|LONGINT|supported constant ``RD_KAFKA_PARTITION_UA``
 error|LONGINT|
 
 ``key`` option of ``rd_kafka_produce()`` is not implemented.
+
+* Consumer (based on the ``rdkafka_consumer_example.c`` example)
+
+```
+error:=KAFKA Consume (brokers;topics;json)
+```
+
+Parameter|Type|Description
+------------|------------|----
+brokers|ARRAY TEXT|
+topics|ARRAY TEXT|
+json|TEXT|delivery report (``JSON``)
+error|LONGINT|
