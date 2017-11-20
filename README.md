@@ -38,7 +38,7 @@ add ``crypt32.lib``.
 * Producer (based on the ``rdkafka_simple_producer.c`` example)
 
 ```
-error:=KAFKA Produce (brokers;topic;payload;json)
+error:=KAFKA Produce (brokers;topic;payload;json;partition)
 ```
 
 Parameter|Type|Description
@@ -47,8 +47,7 @@ brokers|ARRAY TEXT|
 topic|TEXT|
 payload|BLOB|
 json|TEXT|delivery report (``JSON``)
+partition|LONGINT|supported constant ``RD_KAFKA_PARTITION_UA``
 error|LONGINT|
-
-partition is fixed to ``RD_KAFKA_PARTITION_UA``.
 
 ``key`` option of ``rd_kafka_produce()`` is not implemented.
