@@ -52,7 +52,7 @@ Parameter|Type|Description
 brokers|ARRAY TEXT|
 topic|TEXT|pass ``""`` to specify all topics  
 json|TEXT|metadata (``JSON``)
-error|LONGINT|
+error|LONGINT|return value for ``rd_kafka_metadata()``
 
 * Producer (based on the ``rdkafka_simple_producer.c`` example)
 
