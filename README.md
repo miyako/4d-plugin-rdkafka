@@ -65,11 +65,25 @@ Parameter|Type|Description
 brokers|ARRAY TEXT|
 topic|TEXT|
 payload|BLOB|
+key|TEXT|
 json|TEXT|delivery report (``JSON``)
 partition|LONGINT|supported constant ``RD_KAFKA_PARTITION_UA``
 error|LONGINT|
 
-``key`` option of ``rd_kafka_produce()`` is not implemented.
+structure of delivery report:
+
+```
+len : number
+partition : number
+offset : number
+topic : string
+key : string (optional)
+key_len : number (optional)
+create_time : string[int64] (optional)
+append_time : string[int64] (optional)
+value : string
+data : string[base64]
+```
 
 * Consumer (based on the ``rdkafka_consumer_example.c`` example)
 
