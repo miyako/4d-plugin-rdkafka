@@ -36,7 +36,7 @@ add ``crypt32.lib``.
 ## Syntax
 
 ```
-version:=KAFKA_Get_version
+version:=KAFKA Get version
 ```
 
 Parameter|Type|Description
