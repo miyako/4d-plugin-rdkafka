@@ -35,6 +35,25 @@ add ``crypt32.lib``.
 
 ## Syntax
 
+```
+version:=KAFKA_Get_version
+```
+
+Parameter|Type|Description
+------------|------------|----
+version|TEXT|
+
+```
+error:=KAFKA Get topic (brokers;topic;json)
+```
+
+Parameter|Type|Description
+------------|------------|----
+brokers|ARRAY TEXT|
+topic|TEXT|pass ``""`` to specify all topics  
+json|TEXT|delivery report (``JSON``)
+error|LONGINT|
+
 * Producer (based on the ``rdkafka_simple_producer.c`` example)
 
 ```
