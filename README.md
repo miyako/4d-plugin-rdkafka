@@ -49,3 +49,4 @@ payload|BLOB|
 json|TEXT|delivery report (``JSON``)
 error|LONGINT|
 
+partition is fixed to ``RD_KAFKA_PARTITION_UA``.
