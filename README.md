@@ -29,13 +29,11 @@ https://github.com/David-Reguera-Garcia-Dreg/Precompiled-OpenSSL-Windows
 
 add ``crypt32.lib``.
 
-* Producer
-
-based on the ``rdkafka_simple_producer.c`` example
-
 ---
 
 ## Syntax
+
+* Producer (based on the ``rdkafka_simple_producer.c`` example)
 
 ```
 error:=KAFKA Produce (brokers;topic;payload;json)
@@ -48,3 +46,4 @@ topic|TEXT|
 payload|BLOB|
 json|TEXT|delivery report (``JSON``)
 error|LONGINT|
+
