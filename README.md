@@ -9,10 +9,6 @@
 
 disable ``SAFESEH``, add ``legacy_stdio_definitions.lib``, add legacy ``iob`` definition.
 
-```
-FILE __iob_func[3] = { *stdin,*stdout,*stderr };
-```
-
 add ``LIBRDKAFKA_STATICLIB``
 
 expand ``openssl`` macros.
