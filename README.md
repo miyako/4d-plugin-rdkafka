@@ -7,9 +7,7 @@
 
 * Static ``librdkafka`` for Windows
 
-disable ``SAFESEH``, add ``legacy_stdio_definitions.lib``, add legacy ``iob`` definition.
-
-add ``LIBRDKAFKA_STATICLIB``
+disable ``SAFESEH``, add ``legacy_stdio_definitions.lib``, add ``LIBRDKAFKA_STATICLIB``.
 
 expand ``openssl`` macros.
 
