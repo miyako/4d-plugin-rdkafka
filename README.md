@@ -51,7 +51,7 @@ Parameter|Type|Description
 ------------|------------|----
 brokers|ARRAY TEXT|
 topic|TEXT|pass ``""`` to specify all topics  
-json|TEXT|delivery report (``JSON``)
+json|TEXT|metadata (``JSON``)
 error|LONGINT|
 
 * Producer (based on the ``rdkafka_simple_producer.c`` example)
