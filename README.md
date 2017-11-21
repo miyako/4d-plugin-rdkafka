@@ -118,3 +118,32 @@ group|TEXT|optional
 offset|LONGINT|optional
 cound|LONGINT|optional
 error|LONGINT|
+
+```
+error:=KAFKA Get groups (brokers;json)
+```
+
+structure of metadata:
+
+```
+group : string
+state : string
+broker_id : number
+broker_port : number
+broker_host : string
+protocol_type : string
+protocol : string
+members[]
+  member_id : string
+  client_id : string
+  client_host : string
+  member_assignment_size : number
+  member_metadata_size : number
+```
+
+Parameter|Type|Description
+------------|------------|----
+brokers|ARRAY TEXT|
+json|TEXT|metadata (``JSON``)
+
+
