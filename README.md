@@ -111,6 +111,10 @@ error:=KAFKA Consume (brokers;topics;json)
 Parameter|Type|Description
 ------------|------------|----
 brokers|ARRAY TEXT|
-topics|ARRAY TEXT|
+topic|TEXT|
 json|TEXT|delivery report (``JSON``)
+partition|LONGINT|
+group|TEXT|optional
+offset|LONGINT|optional
+cound|LONGINT|optional
 error|LONGINT|
