@@ -44,7 +44,7 @@ Parameter|Type|Description
 version|TEXT|``0.11.1``
 
 ```
-error:=KAFKA Get topic (brokers;topic;json)
+error:=KAFKA Get topics (brokers;topic;json)
 ```
 
 Parameter|Type|Description
@@ -53,6 +53,23 @@ brokers|ARRAY TEXT|
 topic|TEXT|pass ``""`` to specify all topics  
 json|TEXT|metadata (``JSON``)
 error|LONGINT|return value for ``rd_kafka_metadata()``
+
+structure of metadata:
+
+```
+topic : string | "*"
+orig_broker_id : number
+orig_broker_name : string
+brokers[] 
+  port : number
+  id : number
+  host : string
+topics[]
+  topic : string
+  partitions[]
+    id : number
+    leader : number
+```
 
 * Producer (based on the ``rdkafka_simple_producer.c`` example)
 
