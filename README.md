@@ -84,7 +84,7 @@ topic|TEXT|
 payload|BLOB|
 key|TEXT|
 json|TEXT|delivery report (``JSON``)
-partition|LONGINT|supported constant ``RD_KAFKA_PARTITION_UA``
+partition|LONGINT|
 error|LONGINT|
 
 structure of delivery report:
@@ -116,12 +116,23 @@ json|TEXT|delivery report (``JSON``)
 partition|LONGINT|
 group|TEXT|optional
 offset|LONGINT|optional
-cound|LONGINT|optional
+count|LONGINT|optional
 error|LONGINT|
+
+if partition is ``RD_KAFKA_PARTITION_UA``, group must not be empty string.
+
+if group is omitted, partition must not be ``RD_KAFKA_PARTITION_UA``.
+
+if partition is not ``RD_KAFKA_PARTITION_UA``, offset can be relative to total.
 
 ```
 error:=KAFKA Get groups (brokers;json)
 ```
+
+Parameter|Type|Description
+------------|------------|----
+brokers|ARRAY TEXT|
+json|TEXT|metadata (``JSON``)
 
 structure of metadata:
 
@@ -140,10 +151,4 @@ members[]
   member_assignment_size : number
   member_metadata_size : number
 ```
-
-Parameter|Type|Description
-------------|------------|----
-brokers|ARRAY TEXT|
-json|TEXT|metadata (``JSON``)
-
 
