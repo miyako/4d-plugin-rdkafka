@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "json_set_s(void*, wchar_t*, char const*):4DPlugin.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "KAFKA_Get_groups(long long*, unsigned char**):4DPlugin.cpp">
+         <PersistentStrings>
+            <PersistentString
+               value = "errno">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "json_topic_list(void*, rd_kafka_metadata const*, std::basic_string&lt;unsigned char, std::char_traits&lt;unsigned char&gt;, std::allocator&lt;unsigned char&gt; &gt;&amp;):4DPlugin.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "rd_consume_cb(rd_kafka_message_s*, rd_opaque*):4DPlugin.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "rebalance_cb(rd_kafka_s*, rd_kafka_resp_err_t, rd_kafka_topic_partition_list_s*, void*):4DPlugin.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "rd_consume_cb(rd_kafka_message_s*, rd_opaque*, signed char):4DPlugin.cpp">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>

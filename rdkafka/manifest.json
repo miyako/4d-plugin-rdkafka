@@ -1,0 +1,1 @@
+﻿{"name":"RDKAFKA","id":20000,"commands":[{"theme":"RDKAFKA","syntax":"KAFKA Consume(&Y;&T;&T;&L;&T;&L;&L):L"},{"theme":"RDKAFKA","syntax":"KAFKA Produce(&Y;&T;&O;&T;&T;&L):L"},{"theme":"RDKAFKA","syntax":"KAFKA Get version:T"},{"theme":"RDKAFKA","syntax":"KAFKA Get topics(&Y;&T;&T):L"},{"theme":"RDKAFKA","syntax":"KAFKA Get groups(&Y;&T):L"}]}
