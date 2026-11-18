@@ -13,12 +13,10 @@
  *    flush deliver it to the dr_msg_cb with _private = msg_opaque.
  *  - Metadata and group lists are synthetic heap structures released by
  *    their destroy calls.
- *  - Keys carry a trailing NUL: 4DPlugin.cpp passes rkmessage->key to
- *    strlen (json_set_s); real librdkafka keys are not NUL-terminated.
- *  - rd_kafka_message_destroy() defers the free to rd_kafka_destroy():
- *    4DPlugin.cpp reads rkmessage->err after destroying the message.
- *  Both are pre-existing librdkafka-side issues outside the 4D ownership
- *  contracts this harness checks; see README.md.
+ *  - Keys are NOT NUL-terminated, matching real librdkafka: the plugin
+ *    must copy them with key_len (it does).
+ *  - rd_kafka_message_destroy() frees immediately, like real librdkafka:
+ *    the plugin must not touch the message afterwards (it does not).
  */
 
 #include "rdkafka.h"
@@ -45,7 +43,6 @@ struct rd_kafka_topic_s { rd_kafka_t *rk; std::string name; int next; };
 int g_rk_live = 0, g_conf_live = 0, g_topic_conf_live = 0, g_topic_live = 0;
 int g_msg_live = 0, g_metadata_live = 0, g_grplist_live = 0;
 std::string g_brokers;
-std::vector<rd_kafka_message_t *> g_destroyed;
 
 [[noreturn]] static void die(const char *what) {
     fprintf(stderr, "RDKAFKA STUB VIOLATION: %s\n", what);
@@ -69,7 +66,11 @@ static rd_kafka_message_t *new_message(rd_kafka_topic_t *rkt, rd_kafka_resp_err_
     m->offset = offset;
     m->payload = payload ? dup_bytes(payload, len) : 0;
     m->len = len;
-    m->key = key ? dup_bytes(key, key_len) : 0;
+    /* real librdkafka keys are not NUL-terminated */
+    if(key && key_len) {
+        m->key = (char *)malloc(key_len);
+        memcpy(m->key, key, key_len);
+    }
     m->key_len = key_len;
     g_msg_live++;
     return m;
@@ -107,8 +108,6 @@ rd_kafka_t *rd_kafka_new(rd_kafka_type_t type, rd_kafka_conf_t *conf, char *, si
 void rd_kafka_destroy(rd_kafka_t *rk) {
     if(!rk->queued.empty()) die("rd_kafka_destroy with undelivered messages");
     rd_kafka_conf_destroy(rk->conf);
-    for(rd_kafka_message_t *m : g_destroyed) free_message(m);
-    g_destroyed.clear();
     delete rk;
     g_rk_live--;
 }
@@ -141,7 +140,7 @@ rd_kafka_message_t *rd_kafka_consume(rd_kafka_topic_t *t, int32_t, int) {
     if(t->next++ == 0) return new_message(t, RD_KAFKA_RESP_ERR_NO_ERROR, 7, "hello", 5, "k", 1);
     return new_message(t, RD_KAFKA_RESP_ERR__PARTITION_EOF, 8, 0, 0, 0, 0);
 }
-void rd_kafka_message_destroy(rd_kafka_message_t *m) { g_destroyed.push_back(m); }
+void rd_kafka_message_destroy(rd_kafka_message_t *m) { free_message(m); }
 int64_t rd_kafka_message_timestamp(const rd_kafka_message_t *, rd_kafka_timestamp_type_t *tstype) {
     *tstype = RD_KAFKA_TIMESTAMP_CREATE_TIME;
     return 1234;

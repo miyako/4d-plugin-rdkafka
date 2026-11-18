@@ -474,10 +474,7 @@ void control_kafka_get_groups() {
         PA_ClearVariable(&b);
         free_string(&out);
     }
-    /* json_group_list() creates an unused json_item_groups array and never
-       deletes it: a pre-existing libjson leak (not 4D ownership), pinned so
-       any other imbalance still fails. */
-    expect_rdkafka_balanced(1);
+    expect_rdkafka_balanced();
     expect_engine_balanced("KAFKA Get groups leaves nothing behind");
 }
 

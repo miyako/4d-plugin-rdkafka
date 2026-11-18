@@ -402,7 +402,8 @@ static void rd_consume_cb (rd_kafka_message_t *rkmessage, rd_opaque *opaque, BOO
 	
 	if (rkmessage->key_len)
 	{
-		json_set_s(json_item, L"key", (const char *)rkmessage->key);
+		std::string key((const char *)rkmessage->key, rkmessage->key_len);
+		json_set_s(json_item, L"key", key.c_str());
 		json_set_i(json_item, L"key_len", rkmessage->key_len);
 	}
 	
@@ -458,7 +459,8 @@ static void rd_produce_cb (rd_kafka_t *rk,
 		json_set_s(json_item, L"topic", rd_kafka_topic_name(rkmessage->rkt));
 		if (rkmessage->key_len)
 		{
-			json_set_s(json_item, L"key", (const char *)rkmessage->key);
+			std::string key((const char *)rkmessage->key, rkmessage->key_len);
+			json_set_s(json_item, L"key", key.c_str());
 			json_set_i(json_item, L"key_len", rkmessage->key_len);
 		}
 		rd_kafka_timestamp_type_t tstype;
@@ -616,9 +618,10 @@ void __(ARRAY_TEXT& Param1_brokers, const char *topic,
 								}
 							
 								rd_consume_cb(rkmessage, opaque, FALSE);
+								rd_kafka_resp_err_t msg_err = rkmessage->err;
 								rd_kafka_message_destroy(rkmessage);
 								
-								if (!rkmessage->err)
+								if (!msg_err)
 								{
 									*total = *total + 1;
 								}
@@ -752,9 +755,10 @@ void KAFKA_Consume(sLONG_PTR *pResult, PackagePtr pParams)
 											continue;
 										}
 										rd_consume_cb(rkmessage, &opaque, FALSE);
+										rd_kafka_resp_err_t msg_err = rkmessage->err;
 										rd_kafka_message_destroy(rkmessage);
 										
-										if (!rkmessage->err)
+										if (!msg_err)
 										{
 											total = total + 1;
 										}
@@ -932,6 +936,8 @@ void KAFKA_Produce(sLONG_PTR *pResult, PackagePtr pParams)
 				}
 				rd_kafka_destroy(rk);
 			}
+		}else{
+			rd_kafka_conf_destroy(conf);
 		}
 	}
 	
@@ -1088,6 +1094,8 @@ void KAFKA_Get_topics(sLONG_PTR *pResult, PackagePtr pParams)
 				}
 				rd_kafka_destroy(rk);
 			}
+		}else{
+			rd_kafka_conf_destroy(conf);
 		}
 	}
 
@@ -1106,8 +1114,7 @@ void KAFKA_Get_topics(sLONG_PTR *pResult, PackagePtr pParams)
 void json_group_list(JSONNODE *json, const struct rd_kafka_group_list *grplist)
 {
 	/* groups */
-	JSONNODE *json_item_groups = json_new(JSON_ARRAY);
-	for (int i = 0 ; i < grplist->group_cnt ; ++i)
+		for (int i = 0 ; i < grplist->group_cnt ; ++i)
 	{
 		const struct rd_kafka_group_info *gi = &grplist->groups[i];
 		JSONNODE *json_item_group = json_new(JSON_NODE);
@@ -1184,6 +1191,8 @@ void KAFKA_Get_groups(sLONG_PTR *pResult, PackagePtr pParams)
 				}
 				rd_kafka_destroy(rk);
 			}
+		}else{
+			rd_kafka_conf_destroy(conf);
 		}
 	}
 	

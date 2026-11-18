@@ -28,10 +28,7 @@ tests/ownership/run.sh "$B" baseline          # named defects must fail, control
 
 `C_PICTURE` is compiled into the plugin, but no KAFKA command calls it.
 
-Known issues outside 4D ownership. These are worked around or pinned, not fixed:
-- `rd_kafka_message_destroy(rkmessage)` is followed by reads of `rkmessage->err` (the static-partition loop in `KAFKA_Consume` and in `__()`). The stub defers message frees to `rd_kafka_destroy`.
-- Message keys are passed to `json_set_s` as C strings, but librdkafka keys are not NUL-terminated. The stub appends a NUL.
-- `json_group_list()` leaks an unused `json_item_groups` node. `control_kafka_get_groups` pins exactly one leaked node.
+Previously pinned librdkafka/libjson issues are fixed: message `err` is read before `rd_kafka_message_destroy`, message keys are copied with their length before `json_set_s`, and `json_group_list()` no longer creates an unused node. The harness now requires zero leaked libjson nodes.
 
 Not covered:
 - Windows and a real 4D runtime.
