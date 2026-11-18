@@ -55,10 +55,10 @@ Parameter|Type|Description
 ------------|------------|----
 brokers|ARRAY TEXT|
 topic|TEXT|pass ``""`` to specify all topics  
-json|TEXT|metadata (``JSON``)
+json|TEXT|cluster metadata (``JSON`` array)
 error|LONGINT|return value for ``rd_kafka_metadata()``
 
-structure of metadata:
+structure of the metadata object:
 
 ```
 topic : string | "*"
@@ -78,7 +78,7 @@ topics[]
 * Producer (based on the ``rdkafka_simple_producer.c`` example)
 
 ```
-error:=KAFKA Produce (brokers;topic;payload;json;partition)
+error:=KAFKA Produce (brokers;topic;payload;key;json;partition)
 ```
 
 Parameter|Type|Description
@@ -87,11 +87,11 @@ brokers|ARRAY TEXT|
 topic|TEXT|
 payload|BLOB|
 key|TEXT|
-json|TEXT|delivery report (``JSON``)
+json|TEXT|delivery reports (``JSON`` array)
 partition|LONGINT|
 error|LONGINT|
 
-structure of delivery report:
+structure of each delivery report:
 
 ```
 len : number
@@ -106,22 +106,39 @@ value : string
 data : string[base64]
 ```
 
+on failure a report contains only ``error : number``.
+
 * Consumer (based on the ``rdkafka_consumer_example.c`` example)
 
 ```
-error:=KAFKA Consume (brokers;topics;json)
+error:=KAFKA Consume (brokers;topic;json;partition;group;offset;count)
 ```
 
 Parameter|Type|Description
 ------------|------------|----
 brokers|ARRAY TEXT|
 topic|TEXT|
-json|TEXT|delivery report (``JSON``)
+json|TEXT|consumed messages (``JSON`` array)
 partition|LONGINT|
 group|TEXT|optional
 offset|LONGINT|optional
-count|LONGINT|optional
+count|LONGINT|optional; ``0`` or negative means unlimited
 error|LONGINT|
+
+structure of each message:
+
+```
+partition : number
+offset : number
+len : number
+topic : string
+key : string (optional)
+key_len : number (optional)
+create_time : string[int64] (optional)
+append_time : string[int64] (optional)
+value : string
+data : string[base64]
+```
 
 if partition is ``RD_KAFKA_PARTITION_UA``, group must not be empty string.
 
@@ -136,9 +153,9 @@ error:=KAFKA Get groups (brokers;json)
 Parameter|Type|Description
 ------------|------------|----
 brokers|ARRAY TEXT|
-json|TEXT|metadata (``JSON``)
+json|TEXT|groups (``JSON`` array)
 
-structure of metadata:
+structure of each group:
 
 ```
 group : string
