@@ -4,10 +4,13 @@
 #
 #   tests/ownership/run.sh <repo-root> <fixed|baseline>
 #
-# <repo-root> provides rdkafka/ (plugin sources, bundled 4D Plugin API,
-# vendored headers). The harness itself always comes from
-# this script's directory, so the SAME harness can be run against an
-# immutable baseline (git archive of the base SHA) and against the fixed tree.
+# <repo-root> provides the plugin sources (4DPlugin.cpp/h, bundled
+# 4D Plugin API, vendored headers). Since the project was flattened to the
+# repo root the sources sit directly in <repo-root>; for a baseline taken
+# from an archive of the old layout they sit in <repo-root>/rdkafka/. The
+# harness itself always comes from this script's directory, so the SAME
+# harness can be run against an immutable baseline (git archive of the base
+# SHA) and against the fixed tree.
 #
 # The vendored static libraries are i386/x86_64 only, so the harness is
 # built for x86_64 (Rosetta on Apple silicon), matching the plugin's
@@ -18,7 +21,13 @@
 # controls) must pass; anything else is a harness or model error.
 set -euo pipefail
 
-SRC=$(cd "$1/rdkafka" && pwd)
+# Plugin sources sit at the repo root after flattening; archives of the old
+# layout keep them under rdkafka/.
+if [ -f "$1/4DPlugin.cpp" ]; then
+    SRC=$(cd "$1" && pwd)
+else
+    SRC=$(cd "$1/rdkafka" && pwd)
+fi
 MODE=$2
 HERE=$(cd "$(dirname "$0")" && pwd)
 OUT=$(mktemp -d)
