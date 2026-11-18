@@ -15,6 +15,12 @@ https://github.com/miyako/4d-plugin-rdkafka/releases/tag/0.1
 
 ## Build Information
 
+* macOS static libraries are not committed: run ``scripts/build-macos-deps.sh``
+  to build ``a/libcrypto.a``, ``a/libssl.a``, ``a/libz.a``, ``a/librdkafka.a``
+  and ``a/libjson.a`` as universal arm64+x86_64 archives from pinned sources
+  (OpenSSL 1.1.1w, zlib 1.3.1, librdkafka 0.11.1, libjson 7.6.1). Release CI
+  builds and caches them automatically.
+
 * Static ``librdkafka`` for Windows
 
 disable ``SAFESEH``, add ``legacy_stdio_definitions.lib``, add ``LIBRDKAFKA_STATICLIB``.
