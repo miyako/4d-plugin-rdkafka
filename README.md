@@ -21,25 +21,22 @@ https://github.com/miyako/4d-plugin-rdkafka/releases/tag/0.1
   (OpenSSL 1.1.1w, zlib 1.3.1, librdkafka 0.11.1, libjson 7.6.1). Release CI
   builds and caches them automatically.
 
-* Static ``librdkafka`` for Windows
-
-disable ``SAFESEH``, add ``legacy_stdio_definitions.lib``, add ``LIBRDKAFKA_STATICLIB``.
-
-expand ``openssl`` macros.
-
-```
-# define CRYPTO_num_locks()            (1)
-# define SSL_load_error_strings() \
-OPENSSL_init_ssl(0x00200000L \
-| 0x00000002L, NULL)
-#define SSLv23_client_method    TLS_client_method
-```
-
-* Static ``libssl`` and ``libcrypto`` for Windows
-
-https://github.com/David-Reguera-Garcia-Dreg/Precompiled-OpenSSL-Windows
-
-add ``crypt32.lib``.
+* Windows static libraries are not committed as build inputs: run
+  ``scripts/build-windows-deps.ps1`` to rebuild ``lib\64`` (``libcrypto.lib``,
+  ``libssl.lib``, ``libz.lib``, ``librdkafka.lib``, ``libjson.lib``) with the
+  installed MSVC toolchain, from the same pinned sources as macOS (OpenSSL
+  1.1.1w, zlib 1.3.1, librdkafka 0.11.1, libjson 7.6.1). Release CI builds and
+  caches them automatically.
+  The 2017-era v140 archives once committed in ``lib\64`` no longer link with
+  the modern toolchain: their LTCG data comes from a different compiler
+  generation and the plugin link fails with ``LNK C1047``. The rebuild uses
+  the win32 vcxproj's own source list with ``LIBRDKAFKA_STATICLIB`` (the
+  ``LIBRDKAFKA_EXPORTS`` define, needed for the DLL build, is not used) and
+  compiles **without** ``/GL``, so the archives link into the plugin's
+  ``/LTCG`` link from any MSVC generation. ``src/win32_config.h`` enables SSL,
+  zlib, SASL-SCRAM, snappy and plugins, matching the original build; the
+  vcxproj also links ``crypt32.lib``, and librdkafka pulls in ``ws2_32.lib``
+  and ``Secur32.lib`` itself via ``#pragma comment(lib, ...)``.
 
 ---
 

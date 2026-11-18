@@ -89,6 +89,39 @@ jobs:
           Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "$base/Plugins/Default"
           Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "Objs"
 
+      # RDKAFKA.vcxproj links the static libraries in lib\64. Those used to be
+      # committed 2017-era v140 builds; with /GL objects from the current
+      # toolset the v143 linker refused them: "LNK C1047 ... created by a
+      # different version of the compiler" (their LTCG data is stamped with a
+      # different MSVC generation). Like the macOS job builds a/ from pinned
+      # sources, rebuild lib\64 here from the same pinned, checksummed sources
+      # (scripts/build-windows-deps.ps1) with the installed toolchain and
+      # WITHOUT /GL: a plain archive links into the plugin's /LTCG link from
+      # any MSVC generation, so C1047 cannot recur. Cache the archives under
+      # the script's hash so the next release skips the rebuild.
+      - name: restore windows prebuilt libraries
+        id: win-deps-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: lib/64/*.lib
+          key: windows-deps-64-${{ hashFiles('scripts/build-windows-deps.ps1') }}
+
+      - name: build windows prebuilt libraries (cache miss)
+        if: steps.win-deps-cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: scripts/build-windows-deps.ps1
+
+      - name: save windows prebuilt libraries
+        if: steps.win-deps-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: lib/64/*.lib
+          key: windows-deps-64-${{ hashFiles('scripts/build-windows-deps.ps1') }}
+
+      - name: check windows prebuilt libraries
+        shell: pwsh
+        run: scripts/build-windows-deps.ps1 -Check
+
       # windows-latest (Visual Studio 18) has the v145 (MSVC 14.5x, default) and
       # v143 (14.44) toolsets but neither has ATL/MFC. Plugins that use MFC
       # (UseOfMfc, uafxcw*.lib or an #include <afx...>) get the ATLMFC
