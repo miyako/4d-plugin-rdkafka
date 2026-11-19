@@ -39,8 +39,8 @@ $DL = Join-Path $WORK 'dl'
 
 $OPENSSL_URL = 'https://www.openssl.org/source/openssl-1.1.1w.tar.gz'
 $OPENSSL_SHA = 'cf3098950cb4d853ad95c0841f1f9c6d3dc102dccfcacd521d93925208b76ac8'
-$ZLIB_URL    = 'https://zlib.net/fossils/zlib-1.3.1.tar.gz'
-$ZLIB_SHA    = '9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23'
+$ZLIB_URL    = 'https://github.com/madler/zlib/archive/refs/tags/v1.3.1.tar.gz'
+$ZLIB_SHA    = '17e88863f3600672ab49182f217281b6fc4d3c762bde361935e436a95214d05c'
 $RDKAFKA_URL = 'https://github.com/confluentinc/librdkafka/archive/refs/tags/v0.11.1.tar.gz'
 $RDKAFKA_SHA = 'dd035d57c8f19b0b612dd6eefe6e5eebad76f506e302cccb7c2066f25a83585e'
 $JSON_URL    = 'https://downloads.sourceforge.net/project/libjson/libjson_7.6.1.zip'
@@ -90,6 +90,8 @@ function Import-VsDevEnv {
 
 function Get-Source {
   # fetch <url> <sha256> <name>: download with retries into $DL, verify checksum
+  # (a bad body - e.g. a bot/bandwidth page from a mirror - also retries, not
+  # just curl-level errors)
   param([string]$Url, [string]$Sha256, [string]$Name)
   $f = Join-Path $DL $Name
   if (Test-Path $f) {
@@ -100,14 +102,17 @@ function Get-Source {
   }
   for ($i = 1; $i -le 3; $i++) {
     & curl.exe -fSL --retry 3 -o "${f}.tmp" $Url
-    if ($LASTEXITCODE -eq 0) { break }
-    if ($i -eq 3) { throw "download failed: $Url" }
-    Write-Host "download $Url failed (exit $LASTEXITCODE), retrying"
+    if ($LASTEXITCODE -eq 0) {
+      $h = (Get-FileHash -Algorithm SHA256 -Path "${f}.tmp").Hash.ToLowerInvariant()
+      if ($h -eq $Sha256) { Move-Item -Force "${f}.tmp" $f; Write-Host "$($Name): ok"; return }
+      Write-Host "$($Name): checksum mismatch ($h), retry $i/3"
+    } else {
+      Write-Host "download $Url failed (exit $LASTEXITCODE), retry $i/3"
+    }
+    Remove-Item -Force "${f}.tmp" -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 10
   }
-  $h = (Get-FileHash -Algorithm SHA256 -Path "${f}.tmp").Hash.ToLowerInvariant()
-  if ($h -ne $Sha256) { Remove-Item -Force "${f}.tmp"; throw "checksum mismatch: $Url (got $h)" }
-  Move-Item -Force "${f}.tmp" $f
+  throw "download failed or checksum mismatch after 3 attempts: $Url"
 }
 
 function Expand-Source {
@@ -149,6 +154,10 @@ Get-Source $RDKAFKA_URL $RDKAFKA_SHA 'librdkafka-0.11.1.tar.gz'
 Get-Source $JSON_URL    $JSON_SHA    'libjson_7.6.1.zip'
 
 # zlib 1.3.1: static lib with the static CRT (/MT), as the plugin links /MT.
+# The GitHub release archive is used instead of zlib.net/fossils (the source
+# tree is identical, but the fossils server intermittently serves a junk page
+# to runner/datacenter egress IPs; the macOS script still pins the fossil,
+# which works from Apple-network runners).
 # Makefile.msc's compile rule is `$(CC) -c $(WFLAGS) $(CFLAGS) $<`, so the
 # command-line CFLAGS override replaces the default -MD and WFLAGS still adds
 # the _CRT_*_NO_DEPRECATE macros.
