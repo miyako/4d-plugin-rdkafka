@@ -261,7 +261,10 @@ if (-not (Select-String -Path $jdefs -Pattern 'std::pair<x const, y>' -Quiet)) {
 }
 New-Item -ItemType Directory -Force -Path $jObj | Out-Null
 Get-ChildItem "$jObj\*.obj" -ErrorAction SilentlyContinue | Remove-Item -Force
-foreach ($f in Get-ChildItem (Join-Path $J '_internal\Source\*.cpp')) {
+foreach ($f in Get-ChildItem (Join-Path $J '_internal\Source\*.cpp') |
+  Where-Object { $_.Name -notlike '._*' }) {
+  # the sourceforge zip ships AppleDouble "._*" metadata stubs; PowerShell
+  # wildcards match them (unlike bash globs), so exclude them explicitly
   $obj = Join-Path $jObj ($f.BaseName + '.obj')
   & cl.exe /nologo /c /W3 /O2 /MT /DNDEBUG /D_CRT_SECURE_NO_DEPRECATE `
     "/I$J" "/Fo$obj" $f.FullName
